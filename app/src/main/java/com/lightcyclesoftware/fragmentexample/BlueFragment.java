@@ -4,9 +4,14 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
+
+import de.greenrobot.event.EventBus;
 
 
 /**
@@ -28,6 +33,7 @@ public class BlueFragment extends Fragment {
     private String mParam2;
 
     private OnBlueFragmentInteractionListener mListener;
+    private Button mButton;
 
     /**
      * Use this factory method to create a new instance of
@@ -64,7 +70,15 @@ public class BlueFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_blue, container, false);
+        View wView = inflater.inflate(R.layout.fragment_blue, container, false);
+        mButton = (Button) wView.findViewById(R.id.button);
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(new Ball("blue passes the ball"));
+            }
+        });
+        return wView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -83,12 +97,14 @@ public class BlueFragment extends Fragment {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+        EventBus.getDefault().register(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        EventBus.getDefault().unregister(this);
     }
 
     /**
@@ -104,6 +120,10 @@ public class BlueFragment extends Fragment {
     public interface OnBlueFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onBlueFragmentInteraction(Uri uri);
+    }
+
+    public void onEvent(Ball event) {
+
     }
 
 }

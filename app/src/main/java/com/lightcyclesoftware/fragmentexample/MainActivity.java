@@ -7,8 +7,12 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import de.greenrobot.event.EventBus;
 
 
 public class MainActivity extends ActionBarActivity implements BlueFragment.OnBlueFragmentInteractionListener, RedFragment.OnRedFragmentInteractionListener {
@@ -22,6 +26,11 @@ public class MainActivity extends ActionBarActivity implements BlueFragment.OnBl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -44,6 +53,23 @@ public class MainActivity extends ActionBarActivity implements BlueFragment.OnBl
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 
     private void saveState() {
@@ -88,6 +114,11 @@ public class MainActivity extends ActionBarActivity implements BlueFragment.OnBl
 
             return null;
         }
+    }
+
+    public void onEventMainThread(Ball event) {
+        Log.d("event", "ball thrown");
+        Toast.makeText(this,event.getMessage(),Toast.LENGTH_SHORT).show();
     }
 
     private void init() {

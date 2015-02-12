@@ -7,6 +7,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ToggleButton;
+
+import de.greenrobot.event.EventBus;
 
 
 /**
@@ -28,6 +31,8 @@ public class RedFragment extends Fragment {
     private String mParam2;
 
     private OnRedFragmentInteractionListener mListener;
+
+    private ToggleButton mToggleButton;
 
     /**
      * Use this factory method to create a new instance of
@@ -64,7 +69,16 @@ public class RedFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_red, container, false);
+
+        View wView = inflater.inflate(R.layout.fragment_red, container, false);
+        mToggleButton = (ToggleButton) wView.findViewById(R.id.toggleButton);
+        mToggleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(new Ball("red toggle: " + Boolean.toString(mToggleButton.isChecked())));
+            }
+        });
+        return wView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -83,12 +97,29 @@ public class RedFragment extends Fragment {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+        EventBus.getDefault().register(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("toggle", mToggleButton.isChecked());
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            // Restore last state for checked position.
+            mToggleButton.setChecked(savedInstanceState.getBoolean("toggle", false));
+        }
     }
 
     /**
@@ -106,4 +137,7 @@ public class RedFragment extends Fragment {
         public void onRedFragmentInteraction(Uri uri);
     }
 
+    public void onEvent(Ball event) {
+
+    }
 }
