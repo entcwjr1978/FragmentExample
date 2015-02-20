@@ -1,26 +1,32 @@
 package com.lightcyclesoftware.fragmentexample;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
+
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.greenrobot.event.EventBus;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link RedFragment.OnRedFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link RedFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class RedFragment extends Fragment {
+public class RedFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Message>> {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -29,9 +35,9 @@ public class RedFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
-    private OnRedFragmentInteractionListener mListener;
-
+    private ListView mListView;
+    private RssAdapter mAdapter;
+    private Loader mLoader;
     private ToggleButton mToggleButton;
 
     /**
@@ -78,32 +84,21 @@ public class RedFragment extends Fragment {
                 EventBus.getDefault().post(new Ball("red toggle: " + Boolean.toString(mToggleButton.isChecked())));
             }
         });
-        return wView;
-    }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onRedFragmentInteraction(uri);
-        }
+        mListView = (ListView) wView.findViewById(R.id.listView);
+
+        return wView;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        try {
-            mListener = (OnRedFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
         EventBus.getDefault().register(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
         EventBus.getDefault().unregister(this);
     }
 
@@ -120,24 +115,32 @@ public class RedFragment extends Fragment {
             // Restore last state for checked position.
             mToggleButton.setChecked(savedInstanceState.getBoolean("toggle", false));
         }
+        mAdapter = new RssAdapter(getActivity(), 0, new ArrayList<Message>());
+        mListView.setAdapter(mAdapter);
+        mLoader =  getLoaderManager().initLoader(0, null, this);
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnRedFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onRedFragmentInteraction(Uri uri);
+    @Override
+    public Loader<List<Message>> onCreateLoader(int id, Bundle args) {
+        return new SampleLoader(getActivity());
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Message>> loader, List<Message> data) {
+        mAdapter.clear();
+        mAdapter.addAll(data);
+        mAdapter.notifyDataSetChanged();
+        Toast.makeText(getActivity(), "Data Updated", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<Message>> loader) {
+
     }
 
     public void onEvent(Ball event) {
 
     }
+
+
 }
