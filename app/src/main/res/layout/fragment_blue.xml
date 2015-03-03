@@ -4,20 +4,10 @@
     tools:context="com.lightcyclesoftware.fragmentexample.BlueFragment"
     android:background="@color/blue">
 
-    <Switch
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Switch"
-        android:id="@+id/switch1"
-        android:layout_gravity="center"
-        android:layout_above="@+id/button"
-        android:layout_centerHorizontal="true"
-        android:saveEnabled="true" />
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Button"
+        android:text="Send the Ball"
         android:id="@+id/button"
         android:layout_gravity="center"
         android:layout_centerVertical="true"

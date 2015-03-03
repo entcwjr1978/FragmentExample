@@ -1,11 +1,8 @@
 package com.lightcyclesoftware.fragmentexample;
 
-import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -17,8 +14,6 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import java.util.List;
-
 import de.greenrobot.event.EventBus;
 
 
@@ -26,8 +21,7 @@ public class MainActivity extends ActionBarActivity {
 
     private ViewPager mViewPager;
     private MyAdapter mAdapter;
-    private String SENDER_ID = "193349301890";
-    private static final int NUM_ITEMS = 2;
+    private static final int NUM_ITEMS = 3;
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     @Override
@@ -128,8 +122,10 @@ public class MainActivity extends ActionBarActivity {
                     return new BlueFragment();
 
                 case 1:
-                    return new RedFragment();
+                    return new WhiteFragment();
 
+                case 2:
+                    return new DetailsFragment();
             }
 
             return null;
@@ -141,6 +137,10 @@ public class MainActivity extends ActionBarActivity {
         Toast.makeText(this,event.getMessage(),Toast.LENGTH_SHORT).show();
     }
 
+    public void onEventMainThread(Message message) {
+        mViewPager.setCurrentItem(2);
+    }
+
     private void init() {
         mViewPager = (ViewPager) findViewById(R.id.pager);
         //layout for phone form factors
@@ -150,7 +150,7 @@ public class MainActivity extends ActionBarActivity {
         } else { //tablet form factor
             FragmentManager wManager = getSupportFragmentManager();
             wManager.beginTransaction().add(R.id.list,new BlueFragment(), "blue")
-                    .add(R.id.viewer, new RedFragment(), "red").commit();
+                    .add(R.id.viewer, new WhiteFragment(), "red").commit();
         }
         new GcmRegistrationAsyncTask(this).execute();
     }
@@ -175,4 +175,15 @@ public class MainActivity extends ActionBarActivity {
         return true;
     }
 
+    @Override
+    public void onBackPressed() {
+        if (mViewPager.getCurrentItem() == 0) {
+            // If the user is currently looking at the first step, allow the system to handle the
+            // Back button. This calls finish() on this activity and pops the back stack.
+            super.onBackPressed();
+        } else {
+            // Otherwise, select the previous step.
+            mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1);
+        }
+    }
 }

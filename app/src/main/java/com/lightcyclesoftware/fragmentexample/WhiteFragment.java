@@ -1,10 +1,6 @@
 package com.lightcyclesoftware.fragmentexample;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -12,21 +8,18 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import de.greenrobot.event.EventBus;
 
 
-public class RedFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Message>> {
+public class WhiteFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Message>> {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -49,8 +42,8 @@ public class RedFragment extends Fragment implements LoaderManager.LoaderCallbac
      * @return A new instance of fragment RedFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static RedFragment newInstance(String param1, String param2) {
-        RedFragment fragment = new RedFragment();
+    public static WhiteFragment newInstance(String param1, String param2) {
+        WhiteFragment fragment = new WhiteFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -58,7 +51,7 @@ public class RedFragment extends Fragment implements LoaderManager.LoaderCallbac
         return fragment;
     }
 
-    public RedFragment() {
+    public WhiteFragment() {
         // Required empty public constructor
     }
 
@@ -76,7 +69,7 @@ public class RedFragment extends Fragment implements LoaderManager.LoaderCallbac
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        View wView = inflater.inflate(R.layout.fragment_red, container, false);
+        View wView = inflater.inflate(R.layout.fragment_white, container, false);
         mToggleButton = (ToggleButton) wView.findViewById(R.id.toggleButton);
         mToggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,6 +79,12 @@ public class RedFragment extends Fragment implements LoaderManager.LoaderCallbac
         });
 
         mListView = (ListView) wView.findViewById(R.id.listView);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                EventBus.getDefault().post(mAdapter.getItem(position));
+            }
+        });
 
         return wView;
     }
@@ -121,7 +120,7 @@ public class RedFragment extends Fragment implements LoaderManager.LoaderCallbac
     }
 
     @Override
-    public Loader<List<Message>> onCreateLoader(int id, Bundle args) {
+    public Loader onCreateLoader(int id, Bundle args) {
         return new SampleLoader(getActivity());
     }
 
